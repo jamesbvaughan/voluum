@@ -7,30 +7,18 @@ import VolumeSlider from "@/components/VolumeSlider";
 export default function HomeScreen() {
   return (
     <ThemedView style={styles.page}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Volume slider</ThemedText>
-      </ThemedView>
+      <ThemedText type="title">Volume slider</ThemedText>
 
-      <ThemedView style={styles.stepContainer}>
-        <VolumeSlider />
-      </ThemedView>
+      <VolumeSlider />
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 36,
+    paddingTop: 96,
     paddingLeft: 16,
     paddingRight: 16,
-  },
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+    height: "100%",
   },
 });

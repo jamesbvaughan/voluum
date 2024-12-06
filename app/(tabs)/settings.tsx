@@ -37,7 +37,9 @@ export default function SettingsTabScreen() {
     });
 
     return () => {
-      zeroconf?.stop();
+      if (zeroconf) {
+        zeroconf.stop();
+      }
     };
   }, []);
 
@@ -52,9 +54,18 @@ export default function SettingsTabScreen() {
 
   return (
     <ThemedView style={styles.page}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Settings</ThemedText>
-      </ThemedView>
+      <ThemedText type="title">Settings</ThemedText>
+
+      <ThemedText style={styles.label}>Set Speaker IP Address:</ThemedText>
+      <TextInput
+        style={styles.input}
+        value={ipAddress}
+        onChangeText={setIpAddress}
+        placeholder="Enter IP or domain name"
+        keyboardType="url"
+        autoCapitalize="none"
+      />
+      <Button title="Save IP Address" onPress={saveIpAddress} />
 
       <Button title="Search for Speakers" onPress={startDiscovery} />
       <FlatList
@@ -69,31 +80,16 @@ export default function SettingsTabScreen() {
           />
         )}
       />
-
-      <ThemedText style={styles.label}>Set Speaker IP Address:</ThemedText>
-      <TextInput
-        style={styles.input}
-        value={ipAddress}
-        onChangeText={setIpAddress}
-        placeholder="Enter IP or domain name"
-        keyboardType="url"
-        autoCapitalize="none"
-      />
-      <Button title="Save IP Address" onPress={saveIpAddress} />
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
   page: {
-    paddingTop: 36,
+    paddingTop: 96,
     paddingLeft: 16,
     paddingRight: 16,
+    height: "100%",
   },
   headerImage: {
     color: "#808080",
