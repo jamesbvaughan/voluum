@@ -5,17 +5,25 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSettings } from "@/hooks/useSettings";
 
 const zeroconf = new Zeroconf();
 
-export default function SettingsTabScreen() {
-  const [ipAddress, setIpAddress] = useState("");
+function IpAddressConfig() {
+  const savedIpAddress = useSettings((s) => s.speakerIpAddress);
+  const [ipAddress, setIpAddress] = useState(savedIpAddress);
 
   const saveIpAddress = async () => {
+    if (ipAddress == null || ipAddress === "") {
+      return;
+    }
+
     try {
       await AsyncStorage.setItem("speakerIpAddress", ipAddress);
+      useSettings.setState({ speakerIpAddress: ipAddress });
       Alert.alert("Success", "IP address saved!");
     } catch (error) {
+      console.error("Failed to save IP address:", error);
       Alert.alert("Error", "Failed to save IP address.");
     }
   };
@@ -53,13 +61,11 @@ export default function SettingsTabScreen() {
   };
 
   return (
-    <ThemedView style={styles.page}>
-      <ThemedText type="title">Settings</ThemedText>
-
+    <ThemedView>
       <ThemedText style={styles.label}>Set Speaker IP Address:</ThemedText>
       <TextInput
         style={styles.input}
-        value={ipAddress}
+        value={ipAddress ?? ""}
         onChangeText={setIpAddress}
         placeholder="Enter IP or domain name"
         keyboardType="url"
@@ -80,6 +86,54 @@ export default function SettingsTabScreen() {
           />
         )}
       />
+    </ThemedView>
+  );
+}
+
+function MaxVolumeConfig() {
+  const savedMaxVolume = useSettings((s) => s.maxVolume);
+  const [maxVolume, setMaxVolume] = useState(savedMaxVolume);
+
+  async function saveMaxVolume() {
+    try {
+      await AsyncStorage.setItem("maxVolume", maxVolume.toString());
+      useSettings.setState({ maxVolume });
+      Alert.alert("Success", "Max volume saved!");
+    } catch (error) {
+      console.error("Failed to save max volume:", error);
+      Alert.alert("Error", "Failed to save max volume setting.");
+    }
+  }
+
+  return (
+    <ThemedView>
+      <ThemedText style={styles.label}>Max volume</ThemedText>
+      <TextInput
+        style={styles.input}
+        value={maxVolume.toString()}
+        onChangeText={(newVolumeString) => {
+          const newVolume = parseInt(newVolumeString, 10);
+          if (isNaN(newVolume)) {
+            return;
+          }
+
+          setMaxVolume(newVolume);
+        }}
+        placeholder="Enter a max volume level (1-100)"
+        keyboardType="numeric"
+      />
+      <Button title="Save max volume" onPress={saveMaxVolume} />
+    </ThemedView>
+  );
+}
+
+export default function SettingsTabScreen() {
+  return (
+    <ThemedView style={styles.page}>
+      <ThemedText type="title">Settings</ThemedText>
+
+      <IpAddressConfig />
+      <MaxVolumeConfig />
     </ThemedView>
   );
 }

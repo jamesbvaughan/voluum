@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import { ThemedText } from "./ThemedText";
+import { ThemedText } from "../ThemedText";
 import Slider from "@react-native-community/slider";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSettings } from "@/hooks/useSettings";
 
-// TODO: make this configurable
-const MAX_VOLUME = 30;
 const UPDATE_INTERVAL_SECONDS = 10;
 
 async function getCurrentVolumeFromSpeakers(speakerIpAddress: string) {
@@ -21,11 +19,6 @@ async function getCurrentVolumeFromSpeakers(speakerIpAddress: string) {
 }
 
 async function postVolumeToSpeakers(speakerIpAddress: string, volume: number) {
-  if (volume > MAX_VOLUME) {
-    console.error("That's too high!", volume);
-    return;
-  }
-
   const response = await fetch(`http://${speakerIpAddress}/api/setData`, {
     method: "POST",
     headers: {
@@ -45,36 +38,22 @@ async function postVolumeToSpeakers(speakerIpAddress: string, volume: number) {
 }
 
 function VolumeSlider() {
-  const [ipAddress, setIpAddress] = useState<string | null>(null);
+  const { speakerIpAddress, maxVolume } = useSettings();
 
   const [volume, setVolume] = useState<number | null>(null);
 
   useEffect(() => {
-    async function loadIpAddress() {
-      try {
-        const storedIpAddress = await AsyncStorage.getItem("speakerIpAddress");
-        if (storedIpAddress) {
-          setIpAddress(storedIpAddress);
-        }
-      } catch (error) {
-        Alert.alert("Error", "Failed to load saved IP address.");
-      }
-    }
-
-    loadIpAddress();
-  }, []);
-
-  useEffect(() => {
-    if (ipAddress == null) {
+    if (speakerIpAddress == null) {
       return undefined;
     }
 
     async function updateVolume() {
-      if (ipAddress == null) {
+      if (speakerIpAddress == null) {
         return;
       }
 
-      const currentVolume = await getCurrentVolumeFromSpeakers(ipAddress);
+      const currentVolume =
+        await getCurrentVolumeFromSpeakers(speakerIpAddress);
       setVolume(currentVolume);
     }
 
@@ -84,10 +63,10 @@ function VolumeSlider() {
     return () => {
       clearInterval(interval);
     };
-  }, [ipAddress]);
+  }, [speakerIpAddress]);
 
   const handleVolumeChange = async (value: number) => {
-    if (volume == null || ipAddress == null) {
+    if (volume == null || speakerIpAddress == null) {
       return;
     }
 
@@ -95,7 +74,7 @@ function VolumeSlider() {
     setVolume(value);
 
     try {
-      postVolumeToSpeakers(ipAddress, value);
+      postVolumeToSpeakers(speakerIpAddress, value);
     } catch (error) {
       setVolume(volumeBefore);
       Alert.alert("Error", (error as Error).message);
@@ -104,21 +83,21 @@ function VolumeSlider() {
 
   return (
     <View style={styles.container}>
-      <ThemedText style={styles.label}>Volume: {volume}</ThemedText>
-
       {volume == null ? (
         <ThemedText>Loading current volume....</ThemedText>
       ) : (
         <Slider
           style={styles.slider}
           minimumValue={0}
-          maximumValue={MAX_VOLUME}
+          maximumValue={maxVolume}
           step={1}
           value={volume}
           onValueChange={handleVolumeChange}
-          minimumTrackTintColor="#1EB1FC"
-          maximumTrackTintColor="#d3d3d3"
-          thumbTintColor="#1EB1FC"
+          minimumTrackTintColor="transparent"
+          maximumTrackTintColor="transparent"
+          thumbImage={require("./slider-90.png")}
+          trackImage={require("./track-90.png")}
+          inverted
         />
       )}
     </View>
@@ -133,12 +112,15 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   label: {
+    color: "white",
     fontSize: 20,
     marginBottom: 16,
   },
   slider: {
-    width: "100%",
-    height: 40,
+    transform: [{ rotate: "-90deg" }], // Rotate the slider to make it vertical
+
+    width: 600,
+    height: 69,
   },
 });
 
