@@ -12,7 +12,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.jamesbvaughan.voluum",
       "infoPlist": {
-        "NSBonjourServices": ["_http._tcp."],
+        "NSBonjourServices": [
+          "_http._tcp."
+        ],
         "NSLocalNetworkUsageDescription": "For finding speakers to connect to"
       }
     },
@@ -44,6 +46,7 @@
       "eas": {
         "projectId": "74032235-4cc2-449e-9a72-3d8fcd1142cb"
       }
-    }
+    },
+    "owner": "jamesbvaughan"
   }
 }
