@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
-import { ThemedText } from "../ThemedText";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import Slider from "@react-native-community/slider";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -84,11 +83,11 @@ function VolumeSlider() {
   return (
     <View style={styles.container}>
       {volume == null ? (
-        <ThemedText>Loading current volume....</ThemedText>
+        <Text style={styles.label}>Loading current volume....</Text>
       ) : (
         <Slider
           style={styles.slider}
-          minimumValue={0}
+          minimumValue={1}
           maximumValue={maxVolume}
           step={1}
           value={volume}
@@ -114,7 +113,6 @@ const styles = StyleSheet.create({
   label: {
     color: "white",
     fontSize: 20,
-    marginBottom: 16,
   },
   slider: {
     transform: [{ rotate: "-90deg" }], // Rotate the slider to make it vertical
