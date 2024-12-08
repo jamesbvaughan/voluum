@@ -116,7 +116,6 @@ const styles = StyleSheet.create({
   },
   slider: {
     transform: [{ rotate: "-90deg" }], // Rotate the slider to make it vertical
-
     width: 600,
     height: 69,
   },

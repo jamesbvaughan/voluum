@@ -37,6 +37,5 @@ yarn-error.*
 
 app-example
 
-ios/build/
-ios/Pods/
-ios/*.xcworkspace/
+ios
+android

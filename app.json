@@ -10,19 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.jamesbvaughan.voluum"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.jamesbvaughan.voluum"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "bundleIdentifier": "com.jamesbvaughan.voluum",
+      "infoPlist": {
+        "NSBonjourServices": ["_http._tcp."],
+        "NSLocalNetworkUsageDescription": "For finding speakers to connect to"
+      }
     },
     "plugins": [
       "expo-router",
