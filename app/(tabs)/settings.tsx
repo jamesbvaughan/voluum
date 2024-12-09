@@ -32,9 +32,6 @@ function IpAddressConfig() {
   const [isScanning, setIsScanning] = useState(false);
 
   useEffect(() => {
-    // TODO implement the timeouts and edge case handling from
-    // https://github.com/balthazar/react-native-zeroconf/blob/master/example/App.tsx
-
     zeroconf.on("resolved", (device) => {
       console.log("Resolved device:", device);
       setDevices((prevDevices) => ({ ...prevDevices, [device.host]: device }));
