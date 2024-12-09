@@ -8,7 +8,8 @@
     "ios": "expo run:ios",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "knip": "knip"
+    "knip": "knip",
+    "eas-build-pre-install": "corepack enable"
   },
   "jest": {
     "preset": "jest-expo"
