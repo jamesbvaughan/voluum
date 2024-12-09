@@ -35,7 +35,7 @@ export default function RootLayout() {
         useSettings.setState({ maxVolume: parseInt(maxVolume) });
       }
     });
-    AsyncStorage.getItem("ipAddress").then((speakerIpAddress) => {
+    AsyncStorage.getItem("speakerIpAddress").then((speakerIpAddress) => {
       useSettings.setState({ speakerIpAddress });
     });
   }, []);
