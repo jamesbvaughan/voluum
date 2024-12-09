@@ -2,14 +2,12 @@
   "name": "voluum",
   "main": "expo-router/entry",
   "version": "1.0.0",
-  "packageManager": "yarn@4.5.3",
   "scripts": {
     "start": "expo start",
     "ios": "expo run:ios",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "knip": "knip",
-    "eas-build-pre-install": "corepack enable"
+    "knip": "knip"
   },
   "jest": {
     "preset": "jest-expo"
@@ -51,6 +49,7 @@
     "@types/react": "~18.3.12",
     "@types/react-native-zeroconf": "^0.13.1",
     "@types/react-test-renderer": "^18.3.0",
+    "ajv": "^8.17.1",
     "eslint": "^8.57.0",
     "eslint-config-expo": "~8.0.1",
     "eslint-config-prettier": "^9.1.0",
