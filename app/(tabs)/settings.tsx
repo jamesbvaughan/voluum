@@ -82,6 +82,7 @@ function IpAddressConfig() {
             title={item.name}
             onPress={() => {
               setIpAddress(item.addresses[0]);
+              zeroconf.stop();
             }}
           />
         )}
