@@ -82,7 +82,9 @@ function VolumeSlider() {
 
   return (
     <View style={styles.container}>
-      {volume == null ? (
+      {speakerIpAddress == null ? (
+        <Text style={styles.label}>Add a speaker in the settings</Text>
+      ) : volume == null ? (
         <Text style={styles.label}>Loading current volume....</Text>
       ) : (
         <Slider

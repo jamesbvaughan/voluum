@@ -3,7 +3,7 @@ import Zeroconf, { Service } from "react-native-zeroconf";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -28,7 +28,8 @@ function IpAddressConfig() {
     }
   };
 
-  const [devices, setDevices] = useState<Service[]>([]);
+  const [devices, setDevices] = useState<Record<string, Service>>({});
+  const [isScanning, setIsScanning] = useState(false);
 
   useEffect(() => {
     // TODO implement the timeouts and edge case handling from
@@ -36,7 +37,7 @@ function IpAddressConfig() {
 
     zeroconf.on("resolved", (device) => {
       console.log("Resolved device:", device);
-      setDevices((prevDevices) => [...prevDevices, device]);
+      setDevices((prevDevices) => ({ ...prevDevices, [device.host]: device }));
     });
 
     zeroconf.on("error", (err) => {
@@ -44,20 +45,32 @@ function IpAddressConfig() {
       Alert.alert("Error", "Failed to search for devices.");
     });
 
-    return () => {
-      if (zeroconf) {
-        zeroconf.stop();
-      }
-    };
+    zeroconf.on("stop", () => {
+      setIsScanning(false);
+    });
   }, []);
 
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const startDiscovery = () => {
+    if (isScanning) {
+      return;
+    }
+
     if (zeroconf == null) {
       console.error("Zeroconf is not initialized");
     }
 
-    setDevices([]); // Clear previous devices
+    setDevices({}); // Clear previous devices
+    setIsScanning(true);
     zeroconf.scan(); // Start scanning for devices
+
+    if (timeoutRef.current != null) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      zeroconf.stop();
+    });
   };
 
   return (
@@ -75,7 +88,7 @@ function IpAddressConfig() {
 
       <Button title="Search for Speakers" onPress={startDiscovery} />
       <FlatList
-        data={devices}
+        data={Object.values(devices)}
         keyExtractor={(item, index) => `${item.name}-${index}`}
         renderItem={({ item }) => (
           <Button
@@ -93,12 +106,27 @@ function IpAddressConfig() {
 
 function MaxVolumeConfig() {
   const savedMaxVolume = useSettings((s) => s.maxVolume);
-  const [maxVolume, setMaxVolume] = useState(savedMaxVolume);
+  const [maxVolumeInputValue, setMaxVolumeInputValue] = useState(
+    savedMaxVolume.toString(),
+  );
 
   async function saveMaxVolume() {
+    const maxVolumeNumber = parseInt(maxVolumeInputValue, 10);
+    if (
+      isNaN(maxVolumeNumber) ||
+      maxVolumeNumber < 1 ||
+      maxVolumeNumber > 100
+    ) {
+      Alert.alert(
+        "Error",
+        "Invalid max volume level. Please enter a number between 1 and 100.",
+      );
+      return;
+    }
+
     try {
-      await AsyncStorage.setItem("maxVolume", maxVolume.toString());
-      useSettings.setState({ maxVolume });
+      await AsyncStorage.setItem("maxVolume", maxVolumeNumber.toString());
+      useSettings.setState({ maxVolume: maxVolumeNumber });
       Alert.alert("Success", "Max volume saved!");
     } catch (error) {
       console.error("Failed to save max volume:", error);
@@ -111,14 +139,9 @@ function MaxVolumeConfig() {
       <ThemedText style={styles.label}>Max volume</ThemedText>
       <TextInput
         style={styles.input}
-        value={maxVolume.toString()}
+        value={maxVolumeInputValue}
         onChangeText={(newVolumeString) => {
-          const newVolume = parseInt(newVolumeString, 10);
-          if (isNaN(newVolume)) {
-            return;
-          }
-
-          setMaxVolume(newVolume);
+          setMaxVolumeInputValue(newVolumeString);
         }}
         placeholder="Enter a max volume level (1-100)"
         keyboardType="numeric"
@@ -160,6 +183,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: "80%",
     borderColor: "#ccc",
+    color: "white",
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 8,
