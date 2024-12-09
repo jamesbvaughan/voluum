@@ -54,10 +54,6 @@ function IpAddressConfig() {
       return;
     }
 
-    if (zeroconf == null) {
-      console.error("Zeroconf is not initialized");
-    }
-
     setDevices({}); // Clear previous devices
     setIsScanning(true);
     zeroconf.scan(); // Start scanning for devices
@@ -67,7 +63,7 @@ function IpAddressConfig() {
     }
     timeoutRef.current = setTimeout(() => {
       zeroconf.stop();
-    });
+    }, 5000);
   };
 
   return (
@@ -84,6 +80,9 @@ function IpAddressConfig() {
       <Button title="Save IP Address" onPress={saveIpAddress} />
 
       <Button title="Search for Speakers" onPress={startDiscovery} />
+      {isScanning && (
+        <ThemedText style={styles.label}>Searching for devices...</ThemedText>
+      )}
       <FlatList
         data={Object.values(devices)}
         keyExtractor={(item, index) => `${item.name}-${index}`}
